@@ -27,12 +27,40 @@ export const SWR_KEYS = {
 // Fetchers nomeados (reutilizados no preload e nos hooks)
 const fetchers = {
   [SWR_KEYS.products]: async () => {
-    const supabase = createClient()
-    const { data } = await supabase
-      .from('products')
-      .select('*, category:category_id(id, name)')
-      .order('name')
-    return data || []
+    try {
+      const supabase = createClient()
+      
+      // Buscar todos os produtos
+      const { data: productsData, error: productsError } = await supabase
+        .from('products')
+        .select('*')
+        .order('name')
+      
+      if (productsError || !productsData) {
+        console.error('[v0] Erro ao buscar produtos:', productsError?.message)
+        return []
+      }
+      
+      console.log('[v0] Produtos carregados:', productsData.length)
+      
+      // Buscar todas as categorias
+      const { data: categoriesData } = await supabase
+        .from('categories')
+        .select('id, name')
+      
+      const categoryMap = new Map(categoriesData?.map(c => [c.id, c]) || [])
+      
+      // Enriquecer produtos com categorias
+      const enrichedProducts = productsData.map(p => ({
+        ...p,
+        categories: p.category_id ? categoryMap.get(p.category_id) : null
+      }))
+      
+      return enrichedProducts
+    } catch (err) {
+      console.error('[v0] Erro em useProducts:', err)
+      return []
+    }
   },
   [SWR_KEYS.categories]: async () => {
     const supabase = createClient()

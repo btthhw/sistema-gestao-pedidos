@@ -19,6 +19,13 @@ export default function CadastroPage() {
   const [success, setSuccess] = useState(false)
   const router = useRouter()
 
+  // Gera um email de teste único para evitar rate limit
+  function generateTestEmail() {
+    const timestamp = Date.now()
+    const random = Math.random().toString(36).substring(2, 8)
+    return `teste_${timestamp}_${random}@teste.com`
+  }
+
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
@@ -152,14 +159,24 @@ export default function CadastroPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setEmail(generateTestEmail())}
+                  title="Gera um email único para teste (evita rate limit)"
+                >
+                  Gerar
+                </Button>
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Telefone</Label>

@@ -22,18 +22,24 @@ export default function LoginPage() {
     try {
       const supabase = createClient()
       
+      console.log('[v0] Tentando login com:', email)
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
+      console.log('[v0] Login response - Error:', error?.message, 'Session:', data?.session?.user?.id)
+
       if (error) {
+        console.log('[v0] Login error details:', error)
         setError('E-mail ou senha inválidos')
         setLoading(false)
         return
       }
 
       if (data?.session) {
+        console.log('[v0] Login successful, redirecting to dashboard')
         // Aguarda um pouco para garantir que os cookies da sessão foram definidos
         await new Promise(resolve => setTimeout(resolve, 500))
         // Redireciona com um refresh para garantir que o middleware processe a nova sessão
@@ -43,6 +49,7 @@ export default function LoginPage() {
         setLoading(false)
       }
     } catch (err: any) {
+      console.error('[v0] Login catch error:', err)
       setError(err?.message || 'Erro ao fazer login. Tente novamente.')
       setLoading(false)
     }

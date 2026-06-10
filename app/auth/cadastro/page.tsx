@@ -24,28 +24,58 @@ export default function CadastroPage() {
     setLoading(true)
     setError(null)
 
-    const supabase = createClient()
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ?? `${window.location.origin}/auth/callback`,
-        data: {
-          full_name: fullName,
-          phone: phone,
-          role: 'vendedor'
+    try {
+      const supabase = createClient()
+      
+      // Primeiro tenta fazer signup
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ?? `${window.location.origin}/auth/callback`,
+          data: {
+            full_name: fullName,
+            phone: phone,
+            role: 'vendedor'
+          }
+        }
+      })
+
+      if (signUpError) {
+        setError(signUpError.message)
+        setLoading(false)
+        return
+      }
+
+      // Se o signup funcionou, tenta fazer login direto
+      if (signUpData?.user) {
+        const { error: loginError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+
+        if (loginError) {
+          // Se o login falhar (provavelmente por não ter confirmado email), 
+          // mostra mensagem de sucesso mesmo assim
+          setSuccess(true)
+          setLoading(false)
+          return
+        }
+
+        // Se login funcionou, redireciona logo para dashboard
+        if (signUpData?.user?.id) {
+          await new Promise(resolve => setTimeout(resolve, 500))
+          window.location.href = '/dashboard'
+          return
         }
       }
-    })
 
-    if (error) {
-      setError(error.message)
+      setSuccess(true)
       setLoading(false)
-      return
+    } catch (err) {
+      setError('Erro ao cadastrar. Tente novamente.')
+      setLoading(false)
     }
-
-    setSuccess(true)
-    setLoading(false)
   }
 
   if (success) {

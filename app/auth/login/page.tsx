@@ -21,6 +21,7 @@ export default function LoginPage() {
 
     try {
       const supabase = createClient()
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -37,9 +38,12 @@ export default function LoginPage() {
         await new Promise(resolve => setTimeout(resolve, 500))
         // Redireciona com um refresh para garantir que o middleware processe a nova sessão
         window.location.href = '/dashboard'
+      } else {
+        setError('Nenhuma sessão foi criada. Tente novamente.')
+        setLoading(false)
       }
-    } catch (err) {
-      setError('Erro ao fazer login. Tente novamente.')
+    } catch (err: any) {
+      setError(err?.message || 'Erro ao fazer login. Tente novamente.')
       setLoading(false)
     }
   }

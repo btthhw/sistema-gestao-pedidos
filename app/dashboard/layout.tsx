@@ -12,22 +12,29 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Em desenvolvimento, permite acesso direto ao dashboard
+  if (process.env.NODE_ENV === 'development') {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <DataPrefetcher />
+        <Sidebar profile={null} />
+        <main className="lg:ml-64 p-4 lg:p-8 pt-16 lg:pt-8">
+          <PageTransition>{children}</PageTransition>
+        </main>
+      </div>
+    )
+  }
+
   const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
   
-  // Em modo desenvolvimento com credenciais placeholder, permite acesso direto
-  const isPlaceholder = process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('placeholder')
-  const isDevelopment = process.env.NODE_ENV === 'development'
-  const isDemoMode = isDevelopment && isPlaceholder
-  
-  if (!user && !isDemoMode) {
+  if (!user) {
     redirect('/auth/login')
   }
 
   let profile: Profile | null = null
   
-  // Tenta carregar o perfil se o usuário existir
   if (user) {
     const { data } = await supabase
       .from('profiles')

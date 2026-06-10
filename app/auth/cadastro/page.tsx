@@ -34,12 +34,11 @@ export default function CadastroPage() {
     try {
       const supabase = createClient()
       
-      // Primeiro tenta fazer signup
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ?? `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
             full_name: fullName,
             phone: phone,
@@ -49,29 +48,22 @@ export default function CadastroPage() {
       })
 
       if (signUpError) {
-        console.log('[v0] SignUp error:', signUpError.message)
         setError(signUpError.message)
         setLoading(false)
         return
       }
 
-      console.log('[v0] SignUp successful:', signUpData?.user?.id)
-
-      // Em desenvolvimento, confirma o email automaticamente
-      if (process.env.NODE_ENV === 'development') {
-        try {
-          const confirmRes = await fetch('/api/auth/confirm-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
-          })
-          console.log('[v0] Email confirmation response:', confirmRes.status)
-        } catch (confirmErr) {
-          console.error('[v0] Erro ao confirmar email:', confirmErr)
-        }
+      // Confirma email automaticamente
+      try {
+        await fetch('/api/auth/confirm-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        })
+      } catch (err) {
+        // Ignora erro
       }
 
-      // Se o signup funcionou, tenta fazer login direto
       if (signUpData?.user) {
         await new Promise(resolve => setTimeout(resolve, 1000))
         
@@ -80,17 +72,7 @@ export default function CadastroPage() {
           password,
         })
 
-        console.log('[v0] Login attempt - Error:', loginError?.message, 'Data:', loginData?.session?.user?.id)
-
-        if (loginError) {
-          // Se o login falhar, mostra mensagem de sucesso
-          setSuccess(true)
-          setLoading(false)
-          return
-        }
-
-        // Se login funcionou, redireciona logo para dashboard
-        if (loginData?.session) {
+        if (!loginError && loginData?.session) {
           await new Promise(resolve => setTimeout(resolve, 500))
           window.location.href = '/dashboard'
           return
@@ -100,7 +82,6 @@ export default function CadastroPage() {
       setSuccess(true)
       setLoading(false)
     } catch (err) {
-      console.error('[v0] Catch error:', err)
       setError('Erro ao cadastrar. Tente novamente.')
       setLoading(false)
     }

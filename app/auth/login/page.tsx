@@ -46,77 +46,6 @@ export default function LoginPage() {
     }
   }
 
-  async function handleDemoLogin() {
-    setLoading(true)
-    setError(null)
-
-    try {
-      // Cria uma conta de demo com email único
-      const timestamp = Date.now()
-      const random = Math.random().toString(36).substring(2, 8)
-      const demoEmail = `demo_${timestamp}_${random}@demo.teste.com`
-      const demoPassword = 'Demo@123456'
-
-      const supabase = createClient()
-
-      // Tenta fazer signup da demo
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: demoEmail,
-        password: demoPassword,
-        options: {
-          data: {
-            full_name: 'Demo User',
-            phone: '(00) 00000-0000',
-            role: 'vendedor'
-          }
-        }
-      })
-
-      if (signUpError && !signUpError.message.includes('already registered')) {
-        setError('Erro ao criar conta demo: ' + signUpError.message)
-        setLoading(false)
-        return
-      }
-
-      // Aguarda um pouco
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      // Tenta confirmar o email
-      try {
-        await fetch('/api/auth/confirm-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: demoEmail })
-        })
-      } catch (err) {
-        console.error('[v0] Erro ao confirmar email demo:', err)
-      }
-
-      // Aguarda mais um pouco
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      // Tenta fazer login
-      const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-        email: demoEmail,
-        password: demoPassword,
-      })
-
-      if (loginError) {
-        setError('Erro ao fazer login demo: ' + loginError.message)
-        setLoading(false)
-        return
-      }
-
-      if (loginData?.session) {
-        await new Promise(resolve => setTimeout(resolve, 500))
-        window.location.href = '/dashboard'
-      }
-    } catch (err: any) {
-      setError(err?.message || 'Erro ao acessar demo')
-      setLoading(false)
-    }
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
       <Card className="w-full max-w-md">
@@ -162,22 +91,6 @@ export default function LoginPage() {
                 </>
               ) : (
                 'Entrar'
-              )}
-            </Button>
-            <Button 
-              type="button" 
-              variant="outline" 
-              className="w-full" 
-              disabled={loading}
-              onClick={handleDemoLogin}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Demo...
-                </>
-              ) : (
-                'Entrar como Demo'
               )}
             </Button>
           </form>

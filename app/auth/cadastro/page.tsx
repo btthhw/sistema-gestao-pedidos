@@ -34,15 +34,13 @@ export default function CadastroPage() {
     try {
       const supabase = createClient()
       
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
             full_name: fullName,
             phone: phone,
-            role: 'vendedor'
           }
         }
       })
@@ -53,36 +51,10 @@ export default function CadastroPage() {
         return
       }
 
-      // Confirma email automaticamente
-      try {
-        await fetch('/api/auth/confirm-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email })
-        })
-      } catch (err) {
-        // Ignora erro
-      }
-
-      if (signUpData?.user) {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
-
-        if (!loginError && loginData?.session) {
-          await new Promise(resolve => setTimeout(resolve, 500))
-          window.location.href = '/dashboard'
-          return
-        }
-      }
-
       setSuccess(true)
       setLoading(false)
-    } catch (err) {
-      setError('Erro ao cadastrar. Tente novamente.')
+    } catch (err: any) {
+      setError(err?.message || 'Erro ao cadastrar')
       setLoading(false)
     }
   }

@@ -15,12 +15,10 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Plus, Loader2 } from 'lucide-react'
-import { useCustomers } from '@/hooks/use-data'
 
-export const AddCustomerDialog = memo(function AddCustomerDialog() {
+export const AddCustomerDialog = memo(function AddCustomerDialog({ onCustomerAdded }: { onCustomerAdded?: () => void }) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const { mutate } = useCustomers()
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -28,9 +26,6 @@ export const AddCustomerDialog = memo(function AddCustomerDialog() {
 
     const formData = new FormData(e.currentTarget)
     const supabase = createClient()
-
-    // Fechar imediatamente (otimistic close)
-    setOpen(false)
 
     const { error } = await supabase.from('customers').insert({
       name: formData.get('name') as string,
@@ -43,12 +38,15 @@ export const AddCustomerDialog = memo(function AddCustomerDialog() {
       notes: formData.get('notes') as string || null,
     })
 
-    if (!error) {
-      await mutate()
-    }
-
     setLoading(false)
-  }, [mutate])
+
+    if (!error) {
+      setOpen(false)
+      onCustomerAdded?.()
+    } else {
+      alert(`Erro ao salvar cliente: ${error.message}`)
+    }
+  }, [onCustomerAdded])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

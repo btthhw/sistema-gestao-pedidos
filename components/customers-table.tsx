@@ -21,13 +21,11 @@ import {
 import { MoreHorizontal, Pencil, Trash2, Users, Search } from 'lucide-react'
 import { EditCustomerDialog } from '@/components/edit-customer-dialog'
 import { useDebounce } from '@/hooks/use-debounce'
-import { useCustomers } from '@/hooks/use-data'
 import type { Customer } from '@/lib/types'
 
 const ITEMS_PER_PAGE = 25
 
-export const CustomersTable = memo(function CustomersTable() {
-  const { customers, mutate } = useCustomers()
+export const CustomersTable = memo(function CustomersTable({ customers = [], onCustomerDeleted }: { customers: any[], onCustomerDeleted?: () => void }) {
   const [search, setSearch] = useState('')
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
@@ -55,8 +53,8 @@ export const CustomersTable = memo(function CustomersTable() {
 
     const supabase = createClient()
     await supabase.from('customers').delete().eq('id', id)
-    await mutate()
-  }, [mutate])
+    onCustomerDeleted?.()
+  }, [onCustomerDeleted])
 
   return (
     <div className="space-y-4">

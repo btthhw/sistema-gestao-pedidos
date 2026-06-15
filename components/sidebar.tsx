@@ -14,7 +14,9 @@ import {
   BarChart3, 
   LogOut,
   Menu,
-  X
+  X,
+  Clock,
+  CheckCircle
 } from 'lucide-react'
 import { useState, useCallback, useMemo, memo, useTransition } from 'react'
 import type { Profile } from '@/lib/types'
@@ -23,6 +25,8 @@ const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/dashboard/estoque', label: 'Estoque', icon: Package },
   { href: '/dashboard/pedidos', label: 'Pedidos', icon: ShoppingCart },
+  { href: '/dashboard/pedidos-pendentes', label: 'Pedidos Pendentes', icon: Clock },
+  { href: '/dashboard/pedidos-finalizados', label: 'Pedidos Finalizados', icon: CheckCircle },
   { href: '/dashboard/clientes', label: 'Clientes', icon: Users },
   { href: '/dashboard/relatorios', label: 'Relatórios', icon: BarChart3, adminOnly: true },
 ]

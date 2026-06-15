@@ -29,8 +29,6 @@ export function ProductsTable({ products = [], categories = [] }: ProductsTableP
     )
   }, [products, search])
 
-  console.log('[v0] ProductsTable render - products:', products?.length, 'filtered:', filteredProducts?.length)
-
   return (
     <div className="space-y-4">
       <div className="flex gap-2">
@@ -43,8 +41,9 @@ export function ProductsTable({ products = [], categories = [] }: ProductsTableP
         </div>
       </div>
 
-      <div className="border rounded-lg overflow-x-auto">
-        <table className="w-full">
+      <div className="border rounded-lg overflow-hidden" style={{ maxHeight: 'calc(100vh - 200px)' }} id="products-table-scroll">
+        <div className="overflow-x-auto overflow-y-auto h-full">
+          <table className="w-full">
           <thead>
             <tr className="border-b bg-gray-50">
               <th className="px-4 py-3 text-left text-sm font-medium">Produto</th>
@@ -112,7 +111,8 @@ export function ProductsTable({ products = [], categories = [] }: ProductsTableP
               </tr>
             )}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
     </div>
   )

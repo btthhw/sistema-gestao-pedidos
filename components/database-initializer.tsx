@@ -137,12 +137,15 @@ CREATE POLICY "Allow all operations on orders" ON public.orders FOR ALL USING (t
               className="gap-2"
             >
               <Copy className="h-4 w-4" />
-              {copied ? 'Copiado!' : 'Copiar'}
+              {copied ? 'Copiado!' : 'Copiar SQL'}
             </Button>
           </div>
-          <div className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-xs overflow-x-auto max-h-64 overflow-y-auto border border-gray-700">
-            <pre className="whitespace-pre-wrap break-words">{sqlScript}</pre>
+          <div className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-xs overflow-x-auto max-h-80 overflow-y-auto border border-gray-700">
+            <pre className="whitespace-pre-wrap break-words leading-relaxed">{sqlScript}</pre>
           </div>
+          <p className="text-xs text-red-800 bg-red-100 p-2 rounded">
+            💡 <span className="font-medium">Dica:</span> Cole tudo acima no SQL Editor do Supabase e clique em Run/Execute
+          </p>
         </div>
 
         <div className="flex gap-2 justify-end">

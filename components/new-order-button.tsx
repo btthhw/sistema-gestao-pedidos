@@ -187,14 +187,14 @@ export function NewOrderButton() {
           Novo Pedido
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-7xl overflow-auto p-6 w-[90vw] max-h-screen">
         <DialogHeader>
           <DialogTitle>Novo Pedido/Orçamento</DialogTitle>
           <DialogDescription>
             Adicione os produtos e informações do pedido
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* Cliente */}
           <div className="space-y-2">
             <Label htmlFor="customer_id">Cliente</Label>
@@ -236,7 +236,7 @@ export function NewOrderButton() {
                 step="0.01"
                 min="0"
                 placeholder="Quantidade"
-                className="w-32"
+                className="w-40"
                 value={quantity}
                 onChange={(e) => {
                   console.log('[v0] Quantidade alterada:', e.target.value)
@@ -246,15 +246,15 @@ export function NewOrderButton() {
               <Button type="button" variant="secondary" onClick={() => {
                 console.log('[v0] Clicando em adicionar. Produto:', selectedProduct, 'Quantidade:', quantity)
                 addItem()
-              }} className="px-4">
-                <Plus className="h-4 w-4" />
+              }} className="px-6">
+                <Plus className="h-4 w-4 mr-1" />
                 Adicionar
               </Button>
             </div>
 
             {/* Lista de Itens */}
             {items.length > 0 && (
-              <div className="border rounded-lg divide-y">
+              <div className="border rounded-lg divide-y max-h-48 overflow-y-auto">
                 {items.map((item, index) => {
                   const product = products.find(p => p.id === item.product_id)
                   return (
@@ -288,36 +288,29 @@ export function NewOrderButton() {
             )}
           </div>
 
-          {/* Desconto em Porcentagem */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <Label htmlFor="discount">Desconto (%)</Label>
-                <Input 
-                  id="discount" 
-                  name="discount" 
-                  type="number" 
-                  step="0.01" 
-                  min="0"
-                  max="100"
-                  value={discountPercent}
-                  onChange={(e) => setDiscountPercent(e.target.value)}
-                  placeholder="0"
-                  className="mt-1"
-                />
-              </div>
-              <div className="flex-1 text-right pt-6">
-                <p className="text-sm text-muted-foreground mb-1">Desconto em Reais</p>
-                <p className="text-2xl font-bold text-red-600">-{formatCurrency(discountAmount)}</p>
-              </div>
+          {/* Desconto e Total - em uma linha */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="discount">Desconto (%)</Label>
+              <Input 
+                id="discount" 
+                name="discount" 
+                type="number" 
+                step="0.01" 
+                min="0"
+                max="100"
+                value={discountPercent}
+                onChange={(e) => setDiscountPercent(e.target.value)}
+                placeholder="0"
+              />
+              <p className="text-xs text-muted-foreground">-{formatCurrency(discountAmount)}</p>
             </div>
-
-            {/* Total Final */}
-            <div className="border rounded-lg p-4 bg-stone-800/10">
-              <div className="flex items-center justify-between">
-                <span className="font-semibold text-lg">Total Final</span>
-                <span className="font-bold text-2xl text-stone-800">{formatCurrency(total)}</span>
-              </div>
+            
+            <div></div>
+            
+            <div className="border rounded-lg p-4 bg-stone-800/10 flex flex-col justify-center">
+              <p className="text-sm text-muted-foreground mb-1">Total Final</p>
+              <p className="font-bold text-2xl text-stone-800">{formatCurrency(total)}</p>
             </div>
           </div>
 

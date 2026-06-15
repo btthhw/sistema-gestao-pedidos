@@ -187,7 +187,7 @@ export function NewOrderButton() {
           Novo Pedido
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Novo Pedido/Orçamento</DialogTitle>
           <DialogDescription>
@@ -214,7 +214,7 @@ export function NewOrderButton() {
 
           {/* Adicionar Produtos */}
           <div className="space-y-4">
-            <Label>Produtos</Label>
+            <Label>Produtos - Catálogo</Label>
             <div className="flex gap-2">
               <select 
                 value={selectedProduct} 
@@ -235,8 +235,8 @@ export function NewOrderButton() {
                 type="number"
                 step="0.01"
                 min="0"
-                placeholder="Qtd"
-                className="w-24"
+                placeholder="Quantidade"
+                className="w-32"
                 value={quantity}
                 onChange={(e) => {
                   console.log('[v0] Quantidade alterada:', e.target.value)
@@ -246,8 +246,9 @@ export function NewOrderButton() {
               <Button type="button" variant="secondary" onClick={() => {
                 console.log('[v0] Clicando em adicionar. Produto:', selectedProduct, 'Quantidade:', quantity)
                 addItem()
-              }}>
+              }} className="px-4">
                 <Plus className="h-4 w-4" />
+                Adicionar
               </Button>
             </div>
 

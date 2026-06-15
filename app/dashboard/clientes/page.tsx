@@ -2,6 +2,7 @@
 
 import { AddCustomerDialog } from '@/components/add-customer-dialog'
 import { CustomersTable } from '@/components/customers-table'
+import { DatabaseInitializer } from '@/components/database-initializer'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -36,6 +37,8 @@ export default function ClientesPage() {
 
   return (
     <div className="space-y-6">
+      <DatabaseInitializer />
+      
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Clientes</h1>

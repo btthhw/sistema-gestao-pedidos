@@ -41,7 +41,7 @@ export function ProductsTable({ products = [], categories = [] }: ProductsTableP
         </div>
       </div>
 
-      <div className="border rounded-lg overflow-hidden" style={{ maxHeight: 'calc(100vh - 200px)' }} id="products-table-scroll">
+      <div className="border rounded-lg overflow-hidden" style={{ height: '70vh' }} id="products-table-scroll">
         <div className="overflow-x-auto overflow-y-auto h-full">
           <table className="w-full">
           <thead>

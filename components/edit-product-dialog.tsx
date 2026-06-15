@@ -35,8 +35,6 @@ export const EditProductDialog = memo(function EditProductDialog({ product, cate
   const [formData, setFormData] = useState({
     name: product.name || '',
     category_id: product.category_id || '',
-    unit: product.unit || 'un',
-    purchase_price: product.purchase_price || '',
     sale_price: product.sale_price || '',
     stock_quantity: product.stock_quantity || '',
     min_stock: product.min_stock || '',
@@ -48,8 +46,6 @@ export const EditProductDialog = memo(function EditProductDialog({ product, cate
       setFormData({
         name: product.name || '',
         category_id: product.category_id || '',
-        unit: product.unit || 'un',
-        purchase_price: product.purchase_price || '',
         sale_price: product.sale_price || '',
         stock_quantity: product.stock_quantity || '',
         min_stock: product.min_stock || '',
@@ -77,8 +73,6 @@ export const EditProductDialog = memo(function EditProductDialog({ product, cate
       .update({
         name: formData.name,
         category_id: formData.category_id || null,
-        unit: formData.unit,
-        purchase_price: parseFloat(formData.purchase_price as string) || 0,
         sale_price: parseFloat(formData.sale_price as string) || 0,
         stock_quantity: parseInt(formData.stock_quantity as string) || 0,
         min_stock: parseInt(formData.min_stock as string) || 0,
@@ -118,54 +112,23 @@ export const EditProductDialog = memo(function EditProductDialog({ product, cate
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-category_id">Categoria</Label>
-              <Select value={formData.category_id} onValueChange={(value) => handleSelectChange('category_id', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="edit-unit">Unidade *</Label>
-              <Select value={formData.unit} onValueChange={(value) => handleSelectChange('unit', value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="m²">m²</SelectItem>
-                  <SelectItem value="m">m (metro)</SelectItem>
-                  <SelectItem value="un">Unidade</SelectItem>
-                  <SelectItem value="kg">kg</SelectItem>
-                  <SelectItem value="cx">Caixa</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="edit-category_id">Categoria</Label>
+            <Select value={formData.category_id} onValueChange={(value) => handleSelectChange('category_id', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-purchase_price">Preço de Compra (R$)</Label>
-              <Input 
-                id="edit-purchase_price" 
-                name="purchase_price" 
-                type="number" 
-                step="0.01" 
-                min="0"
-                value={formData.purchase_price}
-                onChange={handleChange}
-              />
-            </div>
-
             <div className="space-y-2">
               <Label htmlFor="edit-sale_price">Preço de Venda (R$) *</Label>
               <Input 
@@ -179,9 +142,7 @@ export const EditProductDialog = memo(function EditProductDialog({ product, cate
                 required
               />
             </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="edit-stock_quantity">Quantidade em Estoque</Label>
               <Input 
@@ -193,18 +154,18 @@ export const EditProductDialog = memo(function EditProductDialog({ product, cate
                 onChange={handleChange}
               />
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="edit-min_stock">Estoque Mínimo</Label>
-              <Input 
-                id="edit-min_stock" 
-                name="min_stock" 
-                type="number" 
-                min="0"
-                value={formData.min_stock}
-                onChange={handleChange}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="edit-min_stock">Estoque Mínimo</Label>
+            <Input 
+              id="edit-min_stock" 
+              name="min_stock" 
+              type="number" 
+              min="0"
+              value={formData.min_stock}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="flex justify-end gap-2 pt-4">

@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useCallback, memo } from 'react'
+import { useState, useCallback, memo, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import {
   Dialog,
   DialogContent,
@@ -21,7 +20,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Loader2 } from 'lucide-react'
-import { useProducts } from '@/hooks/use-data'
 import type { Product, Category } from '@/lib/types'
 
 interface EditProductDialogProps {
@@ -29,42 +27,75 @@ interface EditProductDialogProps {
   categories: Category[]
   open: boolean
   onClose: () => void
+  onSuccess?: () => void
 }
 
-export const EditProductDialog = memo(function EditProductDialog({ product, categories, open, onClose }: EditProductDialogProps) {
+export const EditProductDialog = memo(function EditProductDialog({ product, categories, open, onClose, onSuccess }: EditProductDialogProps) {
   const [loading, setLoading] = useState(false)
-  const { mutate } = useProducts()
+  const [formData, setFormData] = useState({
+    name: product.name || '',
+    category_id: product.category_id || '',
+    unit: product.unit || 'un',
+    purchase_price: product.purchase_price || '',
+    sale_price: product.sale_price || '',
+    stock_quantity: product.stock_quantity || '',
+    min_stock: product.min_stock || '',
+  })
+
+  // Atualizar formData quando product mudar
+  useEffect(() => {
+    if (open) {
+      setFormData({
+        name: product.name || '',
+        category_id: product.category_id || '',
+        unit: product.unit || 'un',
+        purchase_price: product.purchase_price || '',
+        sale_price: product.sale_price || '',
+        stock_quantity: product.stock_quantity || '',
+        min_stock: product.min_stock || '',
+      })
+    }
+  }, [product, open])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleSelectChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
 
-    const formData = new FormData(e.currentTarget)
     const supabase = createClient()
-
-    // Fechar imediatamente
-    onClose()
 
     const { error } = await supabase
       .from('products')
       .update({
-        name: formData.get('name') as string,
-        description: formData.get('description') as string || null,
-        category_id: formData.get('category_id') as string || null,
-        unit: formData.get('unit') as string,
-        purchase_price: parseFloat(formData.get('purchase_price') as string) || 0,
-        sale_price: parseFloat(formData.get('sale_price') as string) || 0,
-        stock_quantity: parseFloat(formData.get('stock_quantity') as string) || 0,
-        min_stock: parseFloat(formData.get('min_stock') as string) || 0,
+        name: formData.name,
+        category_id: formData.category_id || null,
+        unit: formData.unit,
+        purchase_price: parseFloat(formData.purchase_price as string) || 0,
+        sale_price: parseFloat(formData.sale_price as string) || 0,
+        stock_quantity: parseInt(formData.stock_quantity as string) || 0,
+        min_stock: parseInt(formData.min_stock as string) || 0,
       })
       .eq('id', product.id)
 
-    if (!error) {
-      await mutate()
+    setLoading(false)
+
+    if (error) {
+      alert(`Erro ao atualizar: ${error.message}`)
+      return
     }
 
-    setLoading(false)
-  }, [product.id, mutate, onClose])
+    alert('Produto atualizado com sucesso!')
+    onSuccess?.()
+    onClose()
+  }, [formData, product.id, onClose, onSuccess])
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -78,18 +109,19 @@ export const EditProductDialog = memo(function EditProductDialog({ product, cate
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="edit-name">Nome do Produto *</Label>
-            <Input id="edit-name" name="name" defaultValue={product.name} required />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="edit-description">Descrição</Label>
-            <Textarea id="edit-description" name="description" defaultValue={product.description || ''} rows={2} />
+            <Input 
+              id="edit-name" 
+              name="name" 
+              value={formData.name}
+              onChange={handleChange}
+              required 
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="edit-category_id">Categoria</Label>
-              <Select name="category_id" defaultValue={product.category_id || ''}>
+              <Select value={formData.category_id} onValueChange={(value) => handleSelectChange('category_id', value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione" />
                 </SelectTrigger>
@@ -105,7 +137,7 @@ export const EditProductDialog = memo(function EditProductDialog({ product, cate
 
             <div className="space-y-2">
               <Label htmlFor="edit-unit">Unidade *</Label>
-              <Select name="unit" defaultValue={product.unit}>
+              <Select value={formData.unit} onValueChange={(value) => handleSelectChange('unit', value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -129,7 +161,8 @@ export const EditProductDialog = memo(function EditProductDialog({ product, cate
                 type="number" 
                 step="0.01" 
                 min="0"
-                defaultValue={product.purchase_price}
+                value={formData.purchase_price}
+                onChange={handleChange}
               />
             </div>
 
@@ -141,22 +174,37 @@ export const EditProductDialog = memo(function EditProductDialog({ product, cate
                 type="number" 
                 step="0.01" 
                 min="0"
-                defaultValue={product.sale_price}
+                value={formData.sale_price}
+                onChange={handleChange}
                 required
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="edit-min_stock">Estoque Mínimo</Label>
-            <Input 
-              id="edit-min_stock" 
-              name="min_stock" 
-              type="number" 
-              step="0.01" 
-              min="0"
-              defaultValue={product.min_stock}
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-stock_quantity">Quantidade em Estoque</Label>
+              <Input 
+                id="edit-stock_quantity" 
+                name="stock_quantity" 
+                type="number" 
+                min="0"
+                value={formData.stock_quantity}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-min_stock">Estoque Mínimo</Label>
+              <Input 
+                id="edit-min_stock" 
+                name="min_stock" 
+                type="number" 
+                min="0"
+                value={formData.min_stock}
+                onChange={handleChange}
+              />
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">

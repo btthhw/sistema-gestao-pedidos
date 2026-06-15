@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -11,15 +11,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { EditProductDialog } from '@/components/edit-product-dialog'
 import type { Product, Category } from '@/lib/types'
 
 interface ProductsTableProps {
   products: (Product & { categories?: { id: string; name: string } | null })[]
   categories: Category[]
+  onProductUpdated?: () => void
 }
 
-export function ProductsTable({ products = [], categories = [] }: ProductsTableProps) {
+export function ProductsTable({ products = [], categories = [], onProductUpdated }: ProductsTableProps) {
   const [search, setSearch] = useState('')
+  const [editingProduct, setEditingProduct] = useState<(Product & { categories?: { id: string; name: string } | null }) | null>(null)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
   const filteredProducts = useMemo(() => {
     if (!products) return []
@@ -28,6 +32,21 @@ export function ProductsTable({ products = [], categories = [] }: ProductsTableP
       product.categories?.name?.toLowerCase().includes(search.toLowerCase())
     )
   }, [products, search])
+
+  const handleEditClick = useCallback((product: Product & { categories?: { id: string; name: string } | null }) => {
+    setEditingProduct(product)
+    setIsEditDialogOpen(true)
+  }, [])
+
+  const handleEditClose = useCallback(() => {
+    setIsEditDialogOpen(false)
+    setEditingProduct(null)
+  }, [])
+
+  const handleEditSuccess = useCallback(() => {
+    handleEditClose()
+    onProductUpdated?.()
+  }, [handleEditClose, onProductUpdated])
 
   return (
     <div className="space-y-4">
@@ -89,7 +108,7 @@ export function ProductsTable({ products = [], categories = [] }: ProductsTableP
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEditClick(product)}>
                             <Pencil className="mr-2 h-4 w-4" />
                             Editar
                           </DropdownMenuItem>
@@ -114,6 +133,16 @@ export function ProductsTable({ products = [], categories = [] }: ProductsTableP
           </table>
         </div>
       </div>
+
+      {editingProduct && (
+        <EditProductDialog
+          product={editingProduct}
+          categories={categories}
+          open={isEditDialogOpen}
+          onClose={handleEditClose}
+          onSuccess={handleEditSuccess}
+        />
+      )}
     </div>
   )
 }

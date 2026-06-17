@@ -144,7 +144,7 @@ export function NewOrderButton() {
         customer_email: customerEmail,
         customer_phone: customerPhone,
         user_id: user?.id || null,
-        status: 'orcamento',
+        status: 'pendente',
         total_amount: total,
         discount: discountAmount,
         notes: formData.get('notes') as string || null,

@@ -48,7 +48,10 @@ export default function PedidosPendentesPage() {
       const supabase = createClient()
       const { error } = await supabase
         .from('orders')
-        .update({ status: 'finalizado' })
+        .update({ 
+          status: 'finalizado',
+          finalized_at: new Date().toISOString()
+        })
         .eq('id', orderId)
 
       if (!error) {

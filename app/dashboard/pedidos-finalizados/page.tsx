@@ -42,12 +42,30 @@ export default function PedidosFinalizadosPage() {
     loadOrders()
   }, [])
 
+  const monthlyRevenue = orders.reduce((sum, order) => sum + (order.total || 0), 0)
+  const currentMonth = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Histórico de Pedidos Finalizados</h1>
         <p className="text-muted-foreground">Visualize todos os pedidos finalizados</p>
       </div>
+
+      <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+        <CardHeader>
+          <CardTitle className="text-green-900">Renda Mensal - {currentMonth.toUpperCase()}</CardTitle>
+          <CardDescription className="text-green-700">Total de pedidos finalizados neste mês</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-4xl font-bold text-green-600">
+            R$ {monthlyRevenue.toFixed(2)}
+          </div>
+          <div className="mt-2 text-sm text-green-700">
+            {orders.length} pedido{orders.length !== 1 ? 's' : ''} finalizado{orders.length !== 1 ? 's' : ''}
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

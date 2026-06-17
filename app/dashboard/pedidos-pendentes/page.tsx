@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { CheckCircle } from 'lucide-react'
+import { useMonthlyRevenue } from '@/hooks/use-data'
 
 interface Order {
   id: string
@@ -19,6 +20,7 @@ interface Order {
 export default function PedidosPendentesPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const { mutate: mutateRevenue } = useMonthlyRevenue()
 
   const loadOrders = async () => {
     try {
@@ -57,6 +59,7 @@ export default function PedidosPendentesPage() {
       if (!error) {
         alert('Pedido finalizado com sucesso!')
         loadOrders()
+        mutateRevenue() // Revalidar renda mensal no dashboard
       } else {
         alert(`Erro ao finalizar: ${error.message}`)
       }

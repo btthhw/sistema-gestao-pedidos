@@ -174,17 +174,19 @@ const fetchers = {
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
     
+    // Buscar pedidos finalizados do mês atual e somar total_amount
     const { data } = await supabase
-      .from('order_items')
-      .select('quantity, unit_price, order:order_id(created_at)')
-      .gte('order.created_at', firstDay.toISOString())
-      .lte('order.created_at', lastDay.toISOString())
+      .from('orders')
+      .select('total_amount')
+      .eq('status', 'finalizado')
+      .gte('created_at', firstDay.toISOString())
+      .lte('created_at', lastDay.toISOString())
     
     if (!data) return 0
     
     // Calcular total do mês
-    const total = data.reduce((sum: number, item: any) => {
-      return sum + ((item.quantity || 0) * (item.unit_price || 0))
+    const total = data.reduce((sum: number, order: any) => {
+      return sum + (order.total_amount || 0)
     }, 0)
     
     return total

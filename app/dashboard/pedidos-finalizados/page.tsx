@@ -42,8 +42,22 @@ export default function PedidosFinalizadosPage() {
     loadOrders()
   }, [])
 
-  const monthlyRevenue = orders.reduce((sum, order) => sum + (order.total_amount || 0), 0)
-  const currentMonth = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+  // Calcular renda mensal (apenas do mês atual)
+  const now = new Date()
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+  
+  const monthlyRevenue = orders
+    .filter(order => {
+      const orderDate = new Date(order.created_at)
+      return orderDate >= firstDay && orderDate <= lastDay
+    })
+    .reduce((sum, order) => sum + (order.total_amount || 0), 0)
+  
+  const currentMonthOrders = orders.filter(order => {
+    const orderDate = new Date(order.created_at)
+    return orderDate >= firstDay && orderDate <= lastDay
+  })
 
   return (
     <div className="space-y-6">
@@ -54,7 +68,7 @@ export default function PedidosFinalizadosPage() {
 
       <Card className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-lg">
         <CardHeader>
-          <CardTitle className="text-white">Renda Mensal - {currentMonth.toUpperCase()}</CardTitle>
+          <CardTitle className="text-white">Renda Mensal - {new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase()}</CardTitle>
           <CardDescription className="text-slate-400">Total de pedidos finalizados neste mês</CardDescription>
         </CardHeader>
         <CardContent>
@@ -62,15 +76,15 @@ export default function PedidosFinalizadosPage() {
             R$ {monthlyRevenue.toFixed(2)}
           </div>
           <div className="mt-2 text-sm text-slate-400">
-            {orders.length} pedido{orders.length !== 1 ? 's' : ''} finalizado{orders.length !== 1 ? 's' : ''}
+            {currentMonthOrders.length} pedido{currentMonthOrders.length !== 1 ? 's' : ''} finalizado{currentMonthOrders.length !== 1 ? 's' : ''}
           </div>
         </CardContent>
       </Card>
 
       <Card className="bg-slate-950 border-slate-700">
         <CardHeader>
-          <CardTitle className="text-white">Pedidos Finalizados ({orders.length})</CardTitle>
-          <CardDescription className="text-slate-400">Histórico completo de pedidos concluídos</CardDescription>
+          <CardTitle className="text-white">Pedidos Finalizados - Este Mês ({currentMonthOrders.length})</CardTitle>
+          <CardDescription className="text-slate-400">Pedidos concluídos neste período</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -78,13 +92,13 @@ export default function PedidosFinalizadosPage() {
               <div className="h-10 bg-slate-800 rounded animate-pulse" />
               <div className="h-64 bg-slate-800 rounded animate-pulse" />
             </div>
-          ) : orders.length === 0 ? (
+          ) : currentMonthOrders.length === 0 ? (
             <div className="text-center py-8 text-slate-500">
-              Nenhum pedido finalizado ainda
+              Nenhum pedido finalizado neste mês
             </div>
           ) : (
             <div className="space-y-3 overflow-y-auto max-h-[70vh]">
-              {orders.map((order) => (
+              {currentMonthOrders.map((order) => (
                 <div
                   key={order.id}
                   className="p-4 border border-slate-700 rounded-lg bg-gradient-to-br from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 transition-all hover:border-slate-600"

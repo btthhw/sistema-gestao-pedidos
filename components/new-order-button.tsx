@@ -69,7 +69,16 @@ export function NewOrderButton() {
       return
     }
 
-    const qty = parseFloat(quantity)
+    // Ler quantidade do state, mas também verificar o DOM como fallback
+    let qty = parseFloat(quantity)
+    
+    // Se a quantidade do state é 0, tenta ler do input DOM
+    if (qty === 0 || isNaN(qty)) {
+      const qtdInput = document.querySelector('input[placeholder="Qtd"]') as HTMLInputElement | null
+      if (qtdInput && qtdInput.value) {
+        qty = parseFloat(qtdInput.value)
+      }
+    }
     
     if (isNaN(qty) || qty <= 0) {
       return
@@ -106,14 +115,7 @@ export function NewOrderButton() {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) {
-      console.log('[v0] Usuário não autenticado')
-      setLoading(false)
-      alert('Você precisa estar autenticado para criar um pedido')
-      return
-    }
-
-    console.log('[v0] Usuário:', user.id)
+    console.log('[v0] Usuário:', user?.id || 'Anônimo')
 
     // Pegar dados do cliente selecionado
     const customerId = formData.get('customer_id') as string || null
@@ -141,7 +143,7 @@ export function NewOrderButton() {
         customer_name: customerName,
         customer_email: customerEmail,
         customer_phone: customerPhone,
-        user_id: user.id,
+        user_id: user?.id || null,
         status: 'orcamento',
         total_amount: total,
         discount: discountAmount,

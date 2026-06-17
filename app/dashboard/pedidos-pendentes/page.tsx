@@ -73,46 +73,46 @@ export default function PedidosPendentesPage() {
         <p className="text-muted-foreground">Gerencie seus pedidos pendentes</p>
       </div>
 
-      <Card>
+      <Card className="bg-slate-950 border-slate-700">
         <CardHeader>
-          <CardTitle>Pedidos Pendentes ({orders.length})</CardTitle>
-          <CardDescription>Clique em "Finalizar" para marcar como concluído</CardDescription>
+          <CardTitle className="text-white">Pedidos Pendentes ({orders.length})</CardTitle>
+          <CardDescription className="text-slate-400">Clique em "Finalizar" para marcar como concluído</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="space-y-2">
-              <div className="h-10 bg-gray-200 rounded animate-pulse" />
-              <div className="h-64 bg-gray-100 rounded animate-pulse" />
+              <div className="h-10 bg-slate-800 rounded animate-pulse" />
+              <div className="h-64 bg-slate-800 rounded animate-pulse" />
             </div>
           ) : orders.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8 text-slate-500">
               Nenhum pedido pendente
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {orders.map((order) => (
                 <div
                   key={order.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                  className="flex items-center justify-between p-4 border border-slate-700 rounded-lg bg-gradient-to-br from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 transition-all hover:border-slate-600"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      <h3 className="font-medium text-lg">{order.customer_name}</h3>
-                      <Badge variant="outline">
+                      <h3 className="font-medium text-lg text-white">{order.customer_name}</h3>
+                      <Badge className="bg-slate-700 text-slate-300">
                         {order.items_count || 0} itens
                       </Badge>
                     </div>
-                    <div className="text-sm text-muted-foreground mt-2">
-                      <p>Total: R$ {(order.total || 0).toFixed(2)}</p>
+                    <div className="text-sm text-slate-400 mt-2">
+                      <p>Total: <span className="text-emerald-400 font-semibold">R$ {(order.total_amount || 0).toFixed(2)}</span></p>
                       <p>Data: {new Date(order.created_at).toLocaleDateString('pt-BR')}</p>
                     </div>
                   </div>
                   <Button
                     onClick={() => handleFinalize(order.id)}
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
                   >
                     <CheckCircle className="mr-2 h-4 w-4" />
-                    Pedido Finalizado
+                    Finalizar
                   </Button>
                 </div>
               ))}

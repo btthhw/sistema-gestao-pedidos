@@ -187,163 +187,166 @@ export function NewOrderButton() {
           Novo Pedido
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-7xl overflow-auto p-6 w-[90vw] max-h-screen">
-        <DialogHeader>
+      <DialogContent className="max-w-full w-screen h-screen max-h-screen overflow-hidden p-4 flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>Novo Pedido/Orçamento</DialogTitle>
           <DialogDescription>
             Adicione os produtos e informações do pedido
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Cliente */}
-          <div className="space-y-2">
-            <Label htmlFor="customer_id">Cliente</Label>
-            <Select name="customer_id">
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um cliente (opcional)" />
-              </SelectTrigger>
-              <SelectContent>
-                {customers.map((customer) => (
-                  <SelectItem key={customer.id} value={customer.id}>
-                    {customer.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Adicionar Produtos */}
-          <div className="space-y-4">
-            <Label>Produtos - Catálogo</Label>
-            <div className="flex gap-2">
-              <select 
-                value={selectedProduct} 
-                onChange={(e) => {
-                  console.log('[v0] Produto selecionado (select nativo):', e.target.value)
-                  setSelectedProduct(e.target.value)
-                }}
-                className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
-              >
-                <option value="">Selecione um produto</option>
-                {products.map((product) => (
-                  <option key={product.id} value={product.id}>
-                    {product.name} - {formatCurrency(Number(product.sale_price))}/{product.unit}
-                  </option>
-                ))}
-              </select>
-              <Input
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="Quantidade"
-                className="w-40"
-                value={quantity}
-                onChange={(e) => {
-                  console.log('[v0] Quantidade alterada:', e.target.value)
-                  setQuantity(e.target.value)
-                }}
-              />
-              <Button type="button" variant="secondary" onClick={() => {
-                console.log('[v0] Clicando em adicionar. Produto:', selectedProduct, 'Quantidade:', quantity)
-                addItem()
-              }} className="px-6">
-                <Plus className="h-4 w-4 mr-1" />
-                Adicionar
-              </Button>
-            </div>
-
-            {/* Lista de Itens */}
-            {items.length > 0 && (
-              <div className="border rounded-lg divide-y max-h-48 overflow-y-auto">
-                {items.map((item, index) => {
-                  const product = products.find(p => p.id === item.product_id)
-                  return (
-                    <div key={index} className="flex items-center justify-between p-3">
-                      <div>
-                        <p className="font-medium">{product?.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {item.quantity} {product?.unit} x {formatCurrency(item.unit_price)}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="font-medium">{formatCurrency(item.total_price)}</span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="text-red-600"
-                          onClick={() => removeItem(index)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )
-                })}
-                <div className="flex items-center justify-between p-3 bg-muted">
-                  <span className="font-medium">Subtotal</span>
-                  <span className="font-bold text-lg">{formatCurrency(subtotal)}</span>
+        <form onSubmit={handleSubmit} className="flex-1 overflow-hidden flex flex-col">
+          <div className="flex-1 overflow-auto pr-2">
+            <div className="space-y-3">
+              {/* Cliente e Desconto em uma linha */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="customer_id">Cliente</Label>
+                  <Select name="customer_id">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um cliente" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {customers.map((customer) => (
+                        <SelectItem key={customer.id} value={customer.id}>
+                          {customer.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="discount">Desconto (%)</Label>
+                  <Input 
+                    id="discount" 
+                    name="discount" 
+                    type="number" 
+                    step="0.01" 
+                    min="0"
+                    max="100"
+                    value={discountPercent}
+                    onChange={(e) => setDiscountPercent(e.target.value)}
+                    placeholder="0"
+                  />
                 </div>
               </div>
-            )}
+
+              {/* Produtos - Catálogo */}
+              <div className="space-y-2">
+                <Label>Produtos - Catálogo</Label>
+                <div className="flex gap-2">
+                  <select 
+                    value={selectedProduct} 
+                    onChange={(e) => {
+                      console.log('[v0] Produto selecionado:', e.target.value)
+                      setSelectedProduct(e.target.value)
+                    }}
+                    className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    <option value="">Selecione um produto</option>
+                    {products.map((product) => (
+                      <option key={product.id} value={product.id}>
+                        {product.name} - {formatCurrency(Number(product.sale_price))}/{product.unit}
+                      </option>
+                    ))}
+                  </select>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="Qtd"
+                    className="w-24"
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                  />
+                  <Button type="button" variant="secondary" onClick={addItem} className="px-4">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Lista de Itens - Compacta */}
+              {items.length > 0 && (
+                <div className="border rounded-lg bg-muted/50 max-h-32 overflow-y-auto">
+                  <div className="divide-y text-sm">
+                    {items.map((item, index) => {
+                      const product = products.find(p => p.id === item.product_id)
+                      return (
+                        <div key={index} className="flex items-center justify-between p-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-xs truncate">{product?.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {item.quantity} {product?.unit} x {formatCurrency(item.unit_price)}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <span className="font-medium text-xs">{formatCurrency(item.total_price)}</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-600 h-6 w-6 p-0"
+                              onClick={() => removeItem(index)}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                    <div className="flex items-center justify-between p-2 bg-muted font-bold text-sm">
+                      <span>Subtotal</span>
+                      <span>{formatCurrency(subtotal)}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Totais - em grid compacto */}
+              <div className="grid grid-cols-2 gap-4 bg-stone-800/10 p-3 rounded-lg">
+                <div>
+                  <p className="text-xs text-muted-foreground">Desconto</p>
+                  <p className="font-bold text-red-600">-{formatCurrency(discountAmount)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground">Total Final</p>
+                  <p className="font-bold text-lg text-stone-800">{formatCurrency(total)}</p>
+                </div>
+              </div>
+
+              {/* Data e Endereço */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="delivery_date" className="text-sm">Data Entrega</Label>
+                  <Input id="delivery_date" name="delivery_date" type="date" className="text-sm" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="delivery_address" className="text-sm">Endereço</Label>
+                  <Input id="delivery_address" name="delivery_address" className="text-sm" />
+                </div>
+              </div>
+
+              {/* Observações - Compacto */}
+              <div className="space-y-2">
+                <Label htmlFor="notes" className="text-sm">Observações</Label>
+                <Textarea id="notes" name="notes" rows={1} className="text-sm" />
+              </div>
+            </div>
           </div>
 
-          {/* Desconto e Total - em uma linha */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="discount">Desconto (%)</Label>
-              <Input 
-                id="discount" 
-                name="discount" 
-                type="number" 
-                step="0.01" 
-                min="0"
-                max="100"
-                value={discountPercent}
-                onChange={(e) => setDiscountPercent(e.target.value)}
-                placeholder="0"
-              />
-              <p className="text-xs text-muted-foreground">-{formatCurrency(discountAmount)}</p>
-            </div>
-            
-            <div></div>
-            
-            <div className="border rounded-lg p-4 bg-stone-800/10 flex flex-col justify-center">
-              <p className="text-sm text-muted-foreground mb-1">Total Final</p>
-              <p className="font-bold text-2xl text-stone-800">{formatCurrency(total)}</p>
-            </div>
-          </div>
-
-          {/* Data de Entrega e Endereço */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="delivery_date">Data de Entrega</Label>
-              <Input id="delivery_date" name="delivery_date" type="date" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="delivery_address">Endereço de Entrega</Label>
-              <Input id="delivery_address" name="delivery_address" />
-            </div>
-          </div>
-
-          {/* Observações */}
-          <div className="space-y-2">
-            <Label htmlFor="notes">Observações</Label>
-            <Textarea id="notes" name="notes" rows={2} />
-          </div>
-
-          <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => { setOpen(false); setItems([]) }}>
+          {/* Botões - fixo na base */}
+          <div className="flex justify-end gap-2 pt-3 flex-shrink-0 border-t">
+            <Button type="button" variant="outline" size="sm" onClick={() => { setOpen(false); setItems([]) }}>
               Cancelar
             </Button>
             <Button 
               type="submit" 
+              size="sm"
               className="bg-stone-800 hover:bg-stone-700" 
               disabled={loading || items.length === 0}
             >
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-3 w-3 animate-spin" />
                   Salvando...
                 </>
               ) : (

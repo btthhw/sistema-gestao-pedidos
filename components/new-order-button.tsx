@@ -36,7 +36,7 @@ export function NewOrderButton() {
   const [loading, setLoading] = useState(false)
   const [items, setItems] = useState<OrderItem[]>([])
   const [selectedProduct, setSelectedProduct] = useState<string>('')
-  const [quantity, setQuantity] = useState<string>('')
+  const [quantity, setQuantity] = useState<string>('0')
   const [discountPercent, setDiscountPercent] = useState<string>('0')
 
   const { customers } = useCustomers()
@@ -84,7 +84,7 @@ export function NewOrderButton() {
 
     setItems(prev => [...prev, newItem])
     setSelectedProduct('')
-    setQuantity('')
+    setQuantity('0')
   }, [selectedProduct, quantity, products])
 
   const removeItem = useCallback((index: number) => {

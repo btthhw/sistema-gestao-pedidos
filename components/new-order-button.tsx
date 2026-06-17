@@ -187,35 +187,35 @@ export function NewOrderButton() {
           Novo Pedido
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-full w-screen h-screen max-h-screen overflow-hidden p-4 flex flex-col">
-        <DialogHeader className="flex-shrink-0">
-          <DialogTitle>Novo Pedido/Orçamento</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-w-full w-full h-screen max-h-screen overflow-hidden p-2 flex flex-col gap-2">
+        <DialogHeader className="flex-shrink-0 pb-1">
+          <DialogTitle className="text-lg">Novo Pedido/Orçamento</DialogTitle>
+          <DialogDescription className="text-xs">
             Adicione os produtos e informações do pedido
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex-1 overflow-hidden flex flex-col">
-          <div className="flex-1 overflow-auto pr-2">
-            <div className="space-y-3">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-hidden flex flex-col gap-2">
+          <div className="flex-1 overflow-auto pr-1">
+            <div className="space-y-2">
               {/* Cliente e Desconto em uma linha */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="customer_id">Cliente</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label htmlFor="customer_id" className="text-xs">Cliente</Label>
                   <Select name="customer_id">
-                    <SelectTrigger>
+                    <SelectTrigger className="h-8 text-sm">
                       <SelectValue placeholder="Selecione um cliente" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="max-h-40">
                       {customers.map((customer) => (
-                        <SelectItem key={customer.id} value={customer.id}>
+                        <SelectItem key={customer.id} value={customer.id} className="text-sm">
                           {customer.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="discount">Desconto (%)</Label>
+                <div className="space-y-1">
+                  <Label htmlFor="discount" className="text-xs">Desconto (%)</Label>
                   <Input 
                     id="discount" 
                     name="discount" 
@@ -226,21 +226,22 @@ export function NewOrderButton() {
                     value={discountPercent}
                     onChange={(e) => setDiscountPercent(e.target.value)}
                     placeholder="0"
+                    className="h-8 text-sm"
                   />
                 </div>
               </div>
 
               {/* Produtos - Catálogo */}
-              <div className="space-y-2">
-                <Label>Produtos - Catálogo</Label>
-                <div className="flex gap-2">
+              <div className="space-y-1">
+                <Label className="text-xs">Produtos - Catálogo</Label>
+                <div className="flex gap-1">
                   <select 
                     value={selectedProduct} 
                     onChange={(e) => {
                       console.log('[v0] Produto selecionado:', e.target.value)
                       setSelectedProduct(e.target.value)
                     }}
-                    className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="flex-1 rounded-md border border-input bg-background px-2 py-1 text-xs"
                   >
                     <option value="">Selecione um produto</option>
                     {products.map((product) => (
@@ -254,46 +255,46 @@ export function NewOrderButton() {
                     step="0.01"
                     min="0"
                     placeholder="Qtd"
-                    className="w-24"
+                    className="w-16 h-8 text-xs p-1"
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
                   />
-                  <Button type="button" variant="secondary" onClick={addItem} className="px-4">
-                    <Plus className="h-4 w-4" />
+                  <Button type="button" variant="secondary" onClick={addItem} className="px-2 h-8 text-xs flex-shrink-0">
+                    <Plus className="h-3 w-3" />
                   </Button>
                 </div>
               </div>
 
-              {/* Lista de Itens - Compacta */}
+              {/* Lista de Itens - Muito Compacta */}
               {items.length > 0 && (
-                <div className="border rounded-lg bg-muted/50 max-h-32 overflow-y-auto">
-                  <div className="divide-y text-sm">
+                <div className="border rounded bg-muted/50 max-h-20 overflow-y-auto">
+                  <div className="divide-y text-xs">
                     {items.map((item, index) => {
                       const product = products.find(p => p.id === item.product_id)
                       return (
-                        <div key={index} className="flex items-center justify-between p-2">
+                        <div key={index} className="flex items-center justify-between p-1 gap-1">
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-xs truncate">{product?.name}</p>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-xs text-muted-foreground truncate">
                               {item.quantity} {product?.unit} x {formatCurrency(item.unit_price)}
                             </p>
                           </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            <span className="font-medium text-xs">{formatCurrency(item.total_price)}</span>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <span className="font-medium text-xs whitespace-nowrap">{formatCurrency(item.total_price)}</span>
                             <Button
                               type="button"
                               variant="ghost"
                               size="sm"
-                              className="text-red-600 h-6 w-6 p-0"
+                              className="text-red-600 h-5 w-5 p-0 flex-shrink-0"
                               onClick={() => removeItem(index)}
                             >
-                              <Trash2 className="h-3 w-3" />
+                              <Trash2 className="h-2.5 w-2.5" />
                             </Button>
                           </div>
                         </div>
                       )
                     })}
-                    <div className="flex items-center justify-between p-2 bg-muted font-bold text-sm">
+                    <div className="flex items-center justify-between p-1 bg-muted font-bold text-xs">
                       <span>Subtotal</span>
                       <span>{formatCurrency(subtotal)}</span>
                     </div>
@@ -302,51 +303,51 @@ export function NewOrderButton() {
               )}
 
               {/* Totais - em grid compacto */}
-              <div className="grid grid-cols-2 gap-4 bg-stone-800/10 p-3 rounded-lg">
+              <div className="grid grid-cols-2 gap-2 bg-stone-800/10 p-2 rounded text-xs">
                 <div>
                   <p className="text-xs text-muted-foreground">Desconto</p>
                   <p className="font-bold text-red-600">-{formatCurrency(discountAmount)}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-muted-foreground">Total Final</p>
-                  <p className="font-bold text-lg text-stone-800">{formatCurrency(total)}</p>
+                  <p className="font-bold text-stone-800">{formatCurrency(total)}</p>
                 </div>
               </div>
 
               {/* Data e Endereço */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="delivery_date" className="text-sm">Data Entrega</Label>
-                  <Input id="delivery_date" name="delivery_date" type="date" className="text-sm" />
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label htmlFor="delivery_date" className="text-xs">Data Entrega</Label>
+                  <Input id="delivery_date" name="delivery_date" type="date" className="h-8 text-xs" />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="delivery_address" className="text-sm">Endereço</Label>
-                  <Input id="delivery_address" name="delivery_address" className="text-sm" />
+                <div className="space-y-1">
+                  <Label htmlFor="delivery_address" className="text-xs">Endereço</Label>
+                  <Input id="delivery_address" name="delivery_address" className="h-8 text-xs" />
                 </div>
               </div>
 
-              {/* Observações - Compacto */}
-              <div className="space-y-2">
-                <Label htmlFor="notes" className="text-sm">Observações</Label>
-                <Textarea id="notes" name="notes" rows={1} className="text-sm" />
+              {/* Observações - Muito Compacto */}
+              <div className="space-y-1">
+                <Label htmlFor="notes" className="text-xs">Observações</Label>
+                <Textarea id="notes" name="notes" rows={1} className="text-xs min-h-6" />
               </div>
             </div>
           </div>
 
           {/* Botões - fixo na base */}
-          <div className="flex justify-end gap-2 pt-3 flex-shrink-0 border-t">
-            <Button type="button" variant="outline" size="sm" onClick={() => { setOpen(false); setItems([]) }}>
+          <div className="flex justify-end gap-1 flex-shrink-0 border-t pt-1">
+            <Button type="button" variant="outline" size="sm" onClick={() => { setOpen(false); setItems([]) }} className="h-8 text-xs">
               Cancelar
             </Button>
             <Button 
               type="submit" 
               size="sm"
-              className="bg-stone-800 hover:bg-stone-700" 
+              className="bg-stone-800 hover:bg-stone-700 h-8 text-xs" 
               disabled={loading || items.length === 0}
             >
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                  <Loader2 className="mr-1 h-2.5 w-2.5 animate-spin" />
                   Salvando...
                 </>
               ) : (

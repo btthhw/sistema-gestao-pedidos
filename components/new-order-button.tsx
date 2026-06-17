@@ -64,9 +64,17 @@ export function NewOrderButton() {
 
   const addItem = useCallback(() => {
     const product = products.find(p => p.id === selectedProduct)
-    if (!product || !quantity) return
+    
+    if (!product) {
+      return
+    }
 
     const qty = parseFloat(quantity)
+    
+    if (isNaN(qty) || qty <= 0) {
+      return
+    }
+
     const newItem: OrderItem = {
       product_id: product.id,
       quantity: qty,
@@ -101,10 +109,26 @@ export function NewOrderButton() {
     if (!user) {
       console.log('[v0] Usuário não autenticado')
       setLoading(false)
+      alert('Você precisa estar autenticado para criar um pedido')
       return
     }
 
     console.log('[v0] Usuário:', user.id)
+
+    // Pegar dados do cliente selecionado
+    const customerId = formData.get('customer_id') as string || null
+    let customerName = ''
+    let customerEmail = ''
+    let customerPhone = ''
+
+    if (customerId) {
+      const customer = customers.find(c => c.id === customerId)
+      if (customer) {
+        customerName = customer.name
+        customerEmail = customer.email || ''
+        customerPhone = customer.phone || ''
+      }
+    }
 
     const discount = parseFloat(formData.get('discount') as string) || 0
 
@@ -113,7 +137,10 @@ export function NewOrderButton() {
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
-        customer_id: formData.get('customer_id') as string || null,
+        customer_id: customerId,
+        customer_name: customerName,
+        customer_email: customerEmail,
+        customer_phone: customerPhone,
         user_id: user.id,
         status: 'orcamento',
         total_amount: total,
@@ -121,6 +148,7 @@ export function NewOrderButton() {
         notes: formData.get('notes') as string || null,
         delivery_address: formData.get('delivery_address') as string || null,
         delivery_date: formData.get('delivery_date') as string || null,
+        items_count: items.length,
       })
       .select('id')
       .single()
@@ -162,7 +190,7 @@ export function NewOrderButton() {
 
     console.log('[v0] Itens inseridos com sucesso')
     
-    // Revalidar cache do SWR (instantâneo, sem router.refresh)
+    // Revalidar cache do SWR
     await mutateOrders()
 
     setLoading(false)
@@ -172,7 +200,7 @@ export function NewOrderButton() {
     
     console.log('[v0] Pedido criado com sucesso!')
     alert('Pedido criado com sucesso!')
-  }, [items, total, discountAmount, mutateOrders])
+  }, [items, customers, total, discountAmount, mutateOrders])
 
   const formatCurrency = useCallback((value: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value),

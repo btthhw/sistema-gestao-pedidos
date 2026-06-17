@@ -96,8 +96,9 @@ export const OrdersTable = memo(function OrdersTable({ orders }: OrdersTableProp
   const filteredOrders = useMemo(() => 
     orders.filter(order => {
       const matchesSearch = 
-        order.order_number.toString().includes(debouncedSearch) ||
-        order.customer?.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+        (order.order_number?.toString() || '').includes(debouncedSearch) ||
+        (order.customer_name?.toLowerCase() || '').includes(debouncedSearch.toLowerCase()) ||
+        (order.customer?.name?.toLowerCase() || '').includes(debouncedSearch.toLowerCase())
       const matchesStatus = statusFilter === 'all' || order.status === statusFilter
       return matchesSearch && matchesStatus
     }),
